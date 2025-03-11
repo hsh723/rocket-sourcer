@@ -1,0 +1,216 @@
+/**
+ * 로켓 소서 관리자 스타일
+ *
+ * @since      1.0.0
+ * @package    Rocket_Sourcer
+ */
+
+/* 대시보드 스타일 */
+.rocket-sourcer-dashboard {
+    margin-top: 20px;
+}
+
+.rocket-sourcer-dashboard-header {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.rocket-sourcer-dashboard-welcome h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.rocket-sourcer-dashboard-stats {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.rocket-sourcer-stat-box {
+    flex: 1 0 200px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 0 10px 20px;
+    text-align: center;
+}
+
+.rocket-sourcer-stat-box h3 {
+    margin-top: 0;
+    color: #23282d;
+    font-size: 14px;
+}
+
+.rocket-sourcer-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0073aa;
+}
+
+.rocket-sourcer-dashboard-recent {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.rocket-sourcer-dashboard-recent h2 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+.rocket-sourcer-view-all {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.rocket-sourcer-dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
+.rocket-sourcer-action-box {
+    flex: 1 0 300px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 0 10px 20px;
+}
+
+.rocket-sourcer-action-box h3 {
+    margin-top: 0;
+    color: #23282d;
+}
+
+/* 설정 페이지 스타일 */
+.rocket-sourcer-settings-container {
+    max-width: 800px;
+}
+
+.rocket-sourcer-settings-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.rocket-sourcer-settings-section h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: #23282d;
+}
+
+/* 제품 관리 페이지 스타일 */
+.rocket-sourcer-product-filters {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.rocket-sourcer-product-filters > * {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.rocket-sourcer-product-filters input[type="text"],
+.rocket-sourcer-product-filters select {
+    min-width: 150px;
+}
+
+.rocket-sourcer-product-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.rocket-sourcer-product-actions .button-small {
+    padding: 0 5px;
+}
+
+/* 데이터 가져오기 페이지 스타일 */
+.rocket-sourcer-import-container {
+    max-width: 800px;
+}
+
+.rocket-sourcer-import-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.rocket-sourcer-import-section h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: #23282d;
+}
+
+.rocket-sourcer-import-form {
+    margin-top: 20px;
+}
+
+.rocket-sourcer-import-form .form-field {
+    margin-bottom: 15px;
+}
+
+.rocket-sourcer-import-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.rocket-sourcer-import-progress {
+    margin-top: 20px;
+    display: none;
+}
+
+.rocket-sourcer-progress-bar {
+    height: 20px;
+    background-color: #f1f1f1;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.rocket-sourcer-progress-bar-inner {
+    height: 100%;
+    background-color: #0073aa;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.rocket-sourcer-progress-status {
+    font-size: 12px;
+    color: #666;
+}
+
+.rocket-sourcer-import-results {
+    margin-top: 20px;
+    display: none;
+}
+
+/* 반응형 스타일 */
+@media screen and (max-width: 782px) {
+    .rocket-sourcer-stat-box {
+        flex: 1 0 100%;
+    }
+    
+    .rocket-sourcer-action-box {
+        flex: 1 0 100%;
+    }
+} 
