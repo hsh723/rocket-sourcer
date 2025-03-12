@@ -1,6 +1,6 @@
 <?php
 /**
- * 수익성 계산기 페이지 템플릿
+ * 공개 마진 계산기 페이지
  *
  * @package RocketSourcer
  */
@@ -12,151 +12,140 @@ if (!defined('ABSPATH')) {
 ?>
 
 <div class="rocket-sourcer-calculator">
-    <div class="rocket-sourcer-calculator-header">
-        <h1>수익성 계산기</h1>
-        <p>제품의 예상 수익과 ROI를 계산해보세요.</p>
+    <div class="rocket-sourcer-header">
+        <h2>쿠팡 마진 계산기</h2>
+        <p>제품 원가와 판매가를 입력하여 쿠팡에서의 실제 마진을 계산해보세요.</p>
     </div>
     
-    <div class="rocket-sourcer-calculator-form">
-        <form id="rocket-sourcer-profit-calculator">
-            <div class="rocket-sourcer-form-section">
-                <h2>제품 정보</h2>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="product_name">제품명</label>
-                    <input type="text" id="product_name" name="product_name" placeholder="제품명을 입력하세요">
-                </div>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="purchase_price">구매 가격 (원)</label>
-                    <input type="number" id="purchase_price" name="purchase_price" min="0" step="100" placeholder="0">
-                </div>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="selling_price">판매 가격 (원)</label>
-                    <input type="number" id="selling_price" name="selling_price" min="0" step="100" placeholder="0">
-                </div>
+    <div class="rocket-sourcer-calculator-container">
+        <div class="rocket-sourcer-calculator-form">
+            <div class="rocket-sourcer-form-group">
+                <label for="calculator-product-cost">제품 원가 (원)</label>
+                <input type="number" id="calculator-product-cost" min="0" step="100" placeholder="제품 원가 입력">
             </div>
             
-            <div class="rocket-sourcer-form-section">
-                <h2>비용 정보</h2>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="shipping_cost">배송비 (원)</label>
-                    <input type="number" id="shipping_cost" name="shipping_cost" min="0" step="100" placeholder="0">
-                </div>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="packaging_cost">포장비 (원)</label>
-                    <input type="number" id="packaging_cost" name="packaging_cost" min="0" step="100" placeholder="0">
-                </div>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="marketing_cost">마케팅 비용 (원)</label>
-                    <input type="number" id="marketing_cost" name="marketing_cost" min="0" step="100" placeholder="0">
-                </div>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="commission_rate">수수료율 (%)</label>
-                    <input type="number" id="commission_rate" name="commission_rate" min="0" max="100" step="0.1" value="10">
-                </div>
+            <div class="rocket-sourcer-form-group">
+                <label for="calculator-selling-price">판매가 (원)</label>
+                <input type="number" id="calculator-selling-price" min="0" step="100" placeholder="판매가 입력">
             </div>
             
-            <div class="rocket-sourcer-form-section">
-                <h2>판매 정보</h2>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="monthly_sales">예상 월 판매량 (개)</label>
-                    <input type="number" id="monthly_sales" name="monthly_sales" min="0" step="1" placeholder="0">
-                </div>
-                
-                <div class="rocket-sourcer-form-row">
-                    <label for="return_rate">예상 반품률 (%)</label>
-                    <input type="number" id="return_rate" name="return_rate" min="0" max="100" step="0.1" value="2">
-                </div>
+            <div class="rocket-sourcer-form-group">
+                <label for="calculator-shipping-cost">배송비 (원)</label>
+                <input type="number" id="calculator-shipping-cost" min="0" step="100" placeholder="배송비 입력">
             </div>
             
-            <div class="rocket-sourcer-form-actions">
-                <button type="submit" class="button button-primary">계산하기</button>
-                <button type="reset" class="button">초기화</button>
-            </div>
-        </form>
-    </div>
-    
-    <div class="rocket-sourcer-calculator-results" style="display: none;">
-        <h2>계산 결과</h2>
-        
-        <div class="rocket-sourcer-results-grid">
-            <div class="rocket-sourcer-result-box">
-                <h3>단위당 수익</h3>
-                <div class="rocket-sourcer-result-value" id="profit_per_unit">0원</div>
-                <div class="rocket-sourcer-result-detail">
-                    <p>판매가: <span id="result_selling_price">0원</span></p>
-                    <p>총 비용: <span id="result_total_cost">0원</span></p>
-                </div>
+            <div class="rocket-sourcer-form-group">
+                <label for="calculator-coupang-fee">쿠팡 수수료 (%)</label>
+                <input type="number" id="calculator-coupang-fee" min="0" max="100" step="0.1" placeholder="쿠팡 수수료 입력" value="10">
             </div>
             
-            <div class="rocket-sourcer-result-box">
-                <h3>월 예상 수익</h3>
-                <div class="rocket-sourcer-result-value" id="monthly_profit">0원</div>
-                <div class="rocket-sourcer-result-detail">
-                    <p>총 매출: <span id="result_monthly_revenue">0원</span></p>
-                    <p>총 비용: <span id="result_monthly_cost">0원</span></p>
-                </div>
+            <div class="rocket-sourcer-form-group">
+                <label for="calculator-return-rate">예상 반품률 (%)</label>
+                <input type="number" id="calculator-return-rate" min="0" max="100" step="0.1" placeholder="예상 반품률 입력" value="3">
             </div>
             
-            <div class="rocket-sourcer-result-box">
-                <h3>수익률</h3>
-                <div class="rocket-sourcer-result-value" id="profit_margin">0%</div>
-                <div class="rocket-sourcer-result-detail">
-                    <p>ROI: <span id="result_roi">0%</span></p>
-                    <p>마진율: <span id="result_margin">0%</span></p>
-                </div>
-            </div>
+            <button type="button" id="calculator-calculate-margin" class="rocket-sourcer-button">계산하기</button>
         </div>
         
-        <div class="rocket-sourcer-results-chart">
-            <canvas id="profitChart"></canvas>
-        </div>
-        
-        <div class="rocket-sourcer-results-breakdown">
-            <h3>비용 분석</h3>
-            <table class="rocket-sourcer-breakdown-table">
-                <thead>
-                    <tr>
-                        <th>항목</th>
-                        <th>금액</th>
-                        <th>비율</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>구매 비용</td>
-                        <td id="breakdown_purchase">0원</td>
-                        <td id="breakdown_purchase_ratio">0%</td>
-                    </tr>
-                    <tr>
-                        <td>배송비</td>
-                        <td id="breakdown_shipping">0원</td>
-                        <td id="breakdown_shipping_ratio">0%</td>
-                    </tr>
-                    <tr>
-                        <td>포장비</td>
-                        <td id="breakdown_packaging">0원</td>
-                        <td id="breakdown_packaging_ratio">0%</td>
-                    </tr>
-                    <tr>
-                        <td>마케팅 비용</td>
-                        <td id="breakdown_marketing">0원</td>
-                        <td id="breakdown_marketing_ratio">0%</td>
-                    </tr>
-                    <tr>
-                        <td>수수료</td>
-                        <td id="breakdown_commission">0원</td>
-                        <td id="breakdown_commission_ratio">0%</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="rocket-sourcer-calculator-results" style="display: none;">
+            <h3>계산 결과</h3>
+            
+            <div class="rocket-sourcer-results-container">
+                <div class="rocket-sourcer-result-section">
+                    <h4>기본 정보</h4>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>판매가:</span>
+                        <span id="calculator-display-selling-price">0원</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>제품 원가:</span>
+                        <span id="calculator-display-product-cost">0원</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>배송비:</span>
+                        <span id="calculator-display-shipping-cost">0원</span>
+                    </div>
+                </div>
+                
+                <div class="rocket-sourcer-result-section">
+                    <h4>수익 분석</h4>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>판매 수익:</span>
+                        <span id="calculator-result-revenue">0원</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>쿠팡 수수료:</span>
+                        <span id="calculator-result-coupang-fee">0원</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>반품 처리 비용:</span>
+                        <span id="calculator-result-return-cost">0원</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>총 비용:</span>
+                        <span id="calculator-result-total-cost">0원</span>
+                    </div>
+                </div>
+                
+                <div class="rocket-sourcer-result-section">
+                    <h4>이익 분석</h4>
+                    
+                    <div class="rocket-sourcer-result-item highlight">
+                        <span>순 이익:</span>
+                        <span id="calculator-result-net-profit">0원</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item highlight">
+                        <span>이익률:</span>
+                        <span id="calculator-result-profit-margin">0%</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>손익분기점 판매량:</span>
+                        <span id="calculator-result-break-even">0개</span>
+                    </div>
+                </div>
+                
+                <div class="rocket-sourcer-result-section">
+                    <h4>월간 예상 실적</h4>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>예상 월 판매량:</span>
+                        <span id="calculator-result-monthly-sales">0개</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item">
+                        <span>예상 월 매출:</span>
+                        <span id="calculator-result-monthly-revenue">0원</span>
+                    </div>
+                    
+                    <div class="rocket-sourcer-result-item highlight">
+                        <span>예상 월 순이익:</span>
+                        <span id="calculator-result-monthly-profit">0원</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="rocket-sourcer-chart-container">
+                <h4>수익 구조 분석</h4>
+                <div id="calculator-profit-chart">
+                    <!-- 차트가 여기에 렌더링됩니다 -->
+                </div>
+            </div>
+            
+            <div class="rocket-sourcer-recommendations">
+                <h4>추천 사항</h4>
+                <ul id="calculator-recommendations">
+                    <!-- 추천 사항이 여기에 동적으로 추가됩니다 -->
+                </ul>
+            </div>
         </div>
     </div>
 </div> 
