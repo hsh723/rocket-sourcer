@@ -1,0 +1,297 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - develop
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: '배포 환경 (production 또는 staging)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - production
+          - staging
+      deploy_type:
+        description: '배포 유형 (full 또는 code-only)'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - code-only
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: rocketsourcer_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, dom, fileinfo, mysql, redis
+          coverage: xdebug
+      
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      
+      - name: Copy environment file
+        run: cp .env.example .env
+      
+      - name: Generate application key
+        run: php artisan key:generate
+      
+      - name: Configure database
+        run: |
+          php artisan config:clear
+          php artisan migrate --env=testing --force
+      
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
+      
+      - name: Run PHP Code Sniffer
+        run: vendor/bin/phpcs
+
+  build:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build assets
+        run: npm run build
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-assets
+          path: public/build
+
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: success()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-assets
+          path: public/build
+      
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      
+      - name: Determine environment
+        id: env
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+            echo "DEPLOY_TYPE=${{ github.event.inputs.deploy_type }}" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "DEPLOY_ENV=production" >> $GITHUB_ENV
+            echo "DEPLOY_TYPE=full" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_ENV=staging" >> $GITHUB_ENV
+            echo "DEPLOY_TYPE=full" >> $GITHUB_ENV
+          fi
+      
+      - name: Prepare deployment
+        run: |
+          echo "Preparing deployment for ${{ env.DEPLOY_ENV }} environment"
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.DEPLOY_ENV == 'production' && 'production.rocketsourcer.com' || 'staging.rocketsourcer.com' }} >> ~/.ssh/known_hosts
+      
+      - name: Transfer deployment script
+        run: |
+          scp -r scripts/deploy.sh deployer@${{ env.DEPLOY_ENV == 'production' && 'production.rocketsourcer.com' || 'staging.rocketsourcer.com' }}:/tmp/deploy.sh
+      
+      - name: Execute deployment
+        run: |
+          ssh deployer@${{ env.DEPLOY_ENV == 'production' && 'production.rocketsourcer.com' || 'staging.rocketsourcer.com' }} "bash /tmp/deploy.sh -e ${{ env.DEPLOY_ENV }} -t ${{ env.DEPLOY_TYPE }} -b ${{ github.ref_name }}"
+      
+      - name: Check deployment health
+        run: |
+          echo "Checking deployment health..."
+          for i in {1..10}; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.DEPLOY_ENV == 'production' && 'rocketsourcer.com' || 'staging.rocketsourcer.com' }}/api/health)
+            if [[ "$response" == "200" ]]; then
+              echo "Health check passed!"
+              break
+            fi
+            if [[ $i -eq 10 ]]; then
+              echo "Health check failed after 10 attempts"
+              exit 1
+            fi
+            echo "Health check attempt $i failed, retrying in 30 seconds..."
+            sleep 30
+          done
+      
+      - name: Notify Slack on success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              "attachments": [
+                {
+                  "color": "good",
+                  "text": ":rocket: Successfully deployed to ${{ env.DEPLOY_ENV }} environment\nCommit: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.actor }}"
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ env.DEPLOY_ENV == 'production' && secrets.SLACK_WEBHOOK_PRODUCTION || secrets.SLACK_WEBHOOK_STAGING }}
+        if: success()
+      
+      - name: Notify Slack on failure
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              "attachments": [
+                {
+                  "color": "danger",
+                  "text": ":boom: Failed to deploy to ${{ env.DEPLOY_ENV }} environment\nCommit: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.actor }}"
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ env.DEPLOY_ENV == 'production' && secrets.SLACK_WEBHOOK_PRODUCTION || secrets.SLACK_WEBHOOK_STAGING }}
+        if: failure()
+
+  canary:
+    name: Canary Deployment
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: success() && github.event.inputs.environment == 'production' && github.event.inputs.deploy_type == 'full'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      
+      - name: Execute canary deployment
+        run: |
+          ssh deployer@production.rocketsourcer.com "bash /tmp/deploy.sh -e production -t full -b ${{ github.ref_name }} -m canary"
+      
+      - name: Shift traffic to canary (10%)
+        run: |
+          echo "Shifting 10% of traffic to canary deployment..."
+          ssh deployer@production.rocketsourcer.com "sudo /usr/local/bin/shift-traffic.sh 10"
+          sleep 300 # 5 minutes monitoring period
+      
+      - name: Check canary health
+        run: |
+          echo "Checking canary health..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://rocketsourcer.com/api/health)
+          if [[ "$response" != "200" ]]; then
+            echo "Canary health check failed, rolling back..."
+            ssh deployer@production.rocketsourcer.com "sudo /usr/local/bin/shift-traffic.sh 0"
+            exit 1
+          fi
+      
+      - name: Shift traffic to canary (50%)
+        run: |
+          echo "Shifting 50% of traffic to canary deployment..."
+          ssh deployer@production.rocketsourcer.com "sudo /usr/local/bin/shift-traffic.sh 50"
+          sleep 300 # 5 minutes monitoring period
+      
+      - name: Check canary health again
+        run: |
+          echo "Checking canary health again..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://rocketsourcer.com/api/health)
+          if [[ "$response" != "200" ]]; then
+            echo "Canary health check failed, rolling back..."
+            ssh deployer@production.rocketsourcer.com "sudo /usr/local/bin/shift-traffic.sh 0"
+            exit 1
+          fi
+      
+      - name: Complete canary deployment
+        run: |
+          echo "Shifting 100% of traffic to canary deployment..."
+          ssh deployer@production.rocketsourcer.com "sudo /usr/local/bin/shift-traffic.sh 100"
+      
+      - name: Notify Slack on success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              "attachments": [
+                {
+                  "color": "good",
+                  "text": ":rocket: Successfully completed canary deployment to production\nCommit: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.actor }}"
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_PRODUCTION }}
+        if: success()
+      
+      - name: Notify Slack on failure
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              "attachments": [
+                {
+                  "color": "danger",
+                  "text": ":boom: Failed canary deployment to production\nCommit: ${{ github.event.head_commit.message }}\nAuthor: ${{ github.actor }}"
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_PRODUCTION }}
+        if: failure()

@@ -1,0 +1,50 @@
+parameters:
+    level: 5
+    paths:
+        - app
+        - tests
+    excludePaths:
+        - vendor
+        - node_modules
+        - storage
+        - bootstrap/cache
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertJsonStructure\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertStatus\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertRedirect\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertSee\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertDontSee\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertJson\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertJsonMissing\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::assertSessionHas\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::withHeaders\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::actingAs\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::get\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::post\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::put\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::delete\(\)#'
+        - '#Call to an undefined method [a-zA-Z0-9\\_]+::json\(\)#'
+        - '#Access to an undefined property [a-zA-Z0-9\\_]+::\$email#'
+        - '#Access to an undefined property [a-zA-Z0-9\\_]+::\$id#'
+        - '#Access to an undefined property [a-zA-Z0-9\\_]+::\$role#'
+    reportUnmatchedIgnoredErrors: false
+    
+services:
+    -
+        class: PHPStan\Rules\Methods\ReturnTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: PHPStan\Rules\Properties\TypesAssignedToPropertiesRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: PHPStan\Rules\Methods\CallMethodsRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: PHPStan\Rules\Methods\CallStaticMethodsRule
+        tags:
+            - phpstan.rules.rule 

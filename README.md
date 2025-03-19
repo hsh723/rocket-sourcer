@@ -1,54 +1,81 @@
-# Rocket Sourcer - 쿠팡 로켓그로스 셀러를 위한 소싱 추천 도구
+# 로켓소서 (RocketSourcer)
 
-Rocket Sourcer는 쿠팡 로켓그로스 셀러들을 위한 소싱 자동추천 워드프레스 플러그인입니다. 다양한 소스에서 제품 데이터를 수집하고 분석하여 높은 ROI를 가진 제품을 추천해 드립니다.
+쿠팡 로켓그로스 셀러들을 위한 데이터 기반 소싱 자동화 시스템입니다.
+
+## 소개
+
+로켓소서는 쿠팡 로켓그로스 셀러들이 데이터 기반으로 높은 성공 확률의 제품을 소싱할 수 있도록 지원하는 시스템입니다. 키워드 분석, 제품 발굴, 수익성 분석, 크로스 카테고리 최적화 등 다양한 기능을 제공합니다.
 
 ## 주요 기능
 
-- **제품 자동 추천**: 쿠팡, 아마존, 알리익스프레스 등에서 수익성 높은 제품을 자동으로 추천
-- **상세 분석**: 제품별 예상 수익, ROI, 판매량 등 상세 분석 제공
-- **필터링 옵션**: 카테고리, 가격대, 최소 ROI 등 다양한 필터링 옵션
-- **즐겨찾기 기능**: 관심 있는 제품을 즐겨찾기에 추가하여 나중에 확인 가능
-- **반응형 디자인**: 모바일, 태블릿, 데스크톱 등 모든 기기에서 최적화된 경험 제공
+- **키워드 분석 및 트렌드 모니터링**: 검색량, 경쟁 강도, 시즌성을 고려한 키워드 분석
+- **제품 발굴 및 검증**: 쿠팡 내 인기 제품 분석 및 경쟁 제품 심층 분석
+- **수익성 분석 및 예측**: 마진 계산, 판매량 예측, ROI 시뮬레이션
+- **크로스 카테고리 최적화**: 다양한 카테고리별 최적화 전략 제안
+- **차별화 전략 제안**: 소구점 분석, 리뷰 기반 개선점 도출
+- **제품 생애주기 관리**: 리뷰 모니터링, 제품 업그레이드 알림
+
+## 요구사항
+
+- PHP 8.0 이상
+- MySQL 5.7 이상
+- Composer
+- Node.js 16.x 이상
+- npm 8.x 이상
 
 ## 설치 방법
 
-1. 플러그인 파일을 `/wp-content/plugins/rocket-sourcer` 디렉토리에 업로드하거나 워드프레스 관리자 패널에서 플러그인 업로드 기능을 사용하세요.
-2. 워드프레스 관리자 패널에서 플러그인을 활성화하세요.
-3. 설정 > 로켓 소서 메뉴에서 API 키 및 기타 설정을 구성하세요.
+1. 저장소 클론:
+```bash
+git clone https://github.com/rocket-sourcer/rocket-sourcer.git
+cd rocket-sourcer
+```
+
+2. 의존성 설치:
+```bash
+composer install
+npm install
+```
+
+3. 환경 설정:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+4. 데이터베이스 설정:
+- .env 파일에서 데이터베이스 정보 설정
+- 마이그레이션 실행:
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+5. 개발 서버 실행:
+```bash
+php artisan serve
+npm run dev
+```
 
 ## 사용 방법
 
-### 관리자 페이지
+1. 웹 브라우저에서 http://localhost:8000 접속
+2. 관리자 계정으로 로그인:
+   - 이메일: admin@rocketsourcer.com
+   - 비밀번호: 초기 비밀번호는 이메일로 전송됨
 
-1. **대시보드**: 제품 통계 및 최근 추가된 제품 확인
-2. **제품 관리**: 모든 제품 목록 확인 및 관리
-3. **데이터 가져오기**: 새로운 제품 데이터 가져오기
-4. **설정**: API 키, 필터링 기준, 데이터 소스 등 설정
+## 기여 방법
 
-### 프론트엔드
-
-워드프레스 페이지나 포스트에 다음 단축코드를 사용하여 제품 목록을 표시할 수 있습니다:
-
-```
-[rocket_sourcer]
-```
-
-다음과 같은 속성을 사용하여 표시되는 제품을 사용자 정의할 수 있습니다:
-
-```
-[rocket_sourcer limit="20" category="fashion" source="coupang" min_roi="50" view="grid"]
-```
-
-## 요구 사항
-
-- WordPress 5.0 이상
-- PHP 7.2 이상
-- MySQL 5.6 이상
-
-## 개발자 정보
-
-이 플러그인은 AI Developer에 의해 개발되었습니다.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 라이선스
 
-이 플러그인은 GPL v2 이상 라이선스 하에 배포됩니다. 
+MIT License
+
+## 문의사항
+
+기술 지원 및 문의사항은 Issues 탭을 이용해 주세요.

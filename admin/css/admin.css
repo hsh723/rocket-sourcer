@@ -1,0 +1,52 @@
+/**
+ * 관리자 영역 스타일
+ */
+.rocket-sourcer-admin {
+    padding: 20px;
+}
+
+.rocket-sourcer-admin h1 {
+    color: #23282d;
+    font-size: 2em;
+    margin-bottom: 1em;
+}
+
+.rocket-sourcer-admin .nav-tab-wrapper {
+    margin-bottom: 1em;
+}
+
+.rocket-sourcer-admin .card {
+    max-width: 100%;
+    margin-top: 1em;
+    padding: 1em;
+}
+
+.rocket-sourcer-admin .form-table {
+    margin-top: 1em;
+}
+
+.rocket-sourcer-admin .form-table th {
+    width: 200px;
+}
+
+.rocket-sourcer-loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.rocket-sourcer-error {
+    color: #dc3232;
+    padding: 10px;
+    margin: 10px 0;
+    border-left: 4px solid #dc3232;
+    background: #fff;
+}
+
+.rocket-sourcer-success {
+    color: #46b450;
+    padding: 10px;
+    margin: 10px 0;
+    border-left: 4px solid #46b450;
+    background: #fff;
+} 

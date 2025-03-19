@@ -1,0 +1,85 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # 보안 헤더 설정
+    <IfModule mod_headers.c>
+        # XSS 보호
+        Header set X-XSS-Protection "1; mode=block"
+        # MIME 스니핑 방지
+        Header set X-Content-Type-Options "nosniff"
+        # 클릭재킹 방지
+        Header set X-Frame-Options "SAMEORIGIN"
+        # HSTS 설정 (HTTPS 강제)
+        Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        # 콘텐츠 보안 정책
+        Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self';"
+        # 참조자 정책
+        Header set Referrer-Policy "strict-origin-when-cross-origin"
+        # 특성 정책
+        Header set Feature-Policy "camera 'none'; microphone 'none'; geolocation 'none'"
+    </IfModule>
+
+    # HTTPS로 리다이렉트
+    <IfModule mod_rewrite.c>
+        RewriteCond %{HTTPS} !=on
+        RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    </IfModule>
+
+    # 핸들 Authorization 헤더
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # 존재하지 않는 디렉토리나 파일에 대한 요청을 index.php로 리다이렉트
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+
+    # 캐싱 설정
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        
+        # 이미지
+        ExpiresByType image/jpeg "access plus 1 year"
+        ExpiresByType image/png "access plus 1 year"
+        ExpiresByType image/gif "access plus 1 year"
+        ExpiresByType image/svg+xml "access plus 1 year"
+        ExpiresByType image/webp "access plus 1 year"
+        
+        # 폰트
+        ExpiresByType font/ttf "access plus 1 year"
+        ExpiresByType font/otf "access plus 1 year"
+        ExpiresByType font/woff "access plus 1 year"
+        ExpiresByType font/woff2 "access plus 1 year"
+        
+        # CSS 및 JavaScript
+        ExpiresByType text/css "access plus 1 month"
+        ExpiresByType text/javascript "access plus 1 month"
+        ExpiresByType application/javascript "access plus 1 month"
+        
+        # 기본값
+        ExpiresDefault "access plus 1 week"
+    </IfModule>
+
+    # 압축 설정
+    <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml
+    </IfModule>
+</IfModule>
+
+# PHP 설정
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 20M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+# 오류 페이지
+ErrorDocument 404 /index.php
+ErrorDocument 500 /index.php
+ErrorDocument 403 /index.php 

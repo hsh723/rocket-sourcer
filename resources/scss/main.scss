@@ -1,0 +1,35 @@
+// Base styles
+@import 'base/reset';
+@import 'base/variables';
+@import 'base/typography';
+@import 'base/utilities';
+
+// Components
+@import 'components/buttons';
+@import 'components/forms';
+@import 'components/cards';
+@import 'components/tables';
+
+// Layout
+@import 'layout/header';
+@import 'layout/sidebar';
+@import 'layout/footer';
+@import 'layout/grid';
+
+// Pages
+@import 'pages/dashboard';
+@import 'pages/products';
+@import 'pages/keywords';
+@import 'pages/analysis';
+
+// Themes
+@import 'themes/light';
+@import 'themes/dark';
+
+// Responsive
+@import 'responsive/mobile';
+@import 'responsive/tablet';
+@import 'responsive/desktop';
+
+// Vendor
+@import 'vendor/mui-overrides'; 
